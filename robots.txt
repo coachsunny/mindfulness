@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://coachsunny.github.io/mindfulness/sitemap.xml

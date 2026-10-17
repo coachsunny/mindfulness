@@ -1,0 +1,67 @@
+# ============================================
+# 夜嶼靜心 · 睡前正念療癒誌 (Jekyll 網站設定檔)
+# 架構參考：D:\blog (心茶記)
+# ============================================
+
+# 網站基本資訊
+title: 夜嶼靜心
+tagline: 每週 10～15 分鐘的睡前正念冥想
+description: 一個專為睡前時光打造的每週正念療癒空間。結合睡前靜心小文、睡眠與正念腦科學學理、10~15分鐘躺姿冥想引導與晚安正念話語，陪你卸下一天的疲憊，安然入眠。
+author: Sunny
+email: shunyi.lee@gmail.com
+lang: zh-TW
+timezone: Asia/Taipei
+
+# 網站 URL（部署到 GitHub Pages 後，若倉庫名稱不同請修改 baseurl）
+url: "https://coachsunny.github.io"
+baseurl: "/mindfulness"
+
+# 建置設定
+markdown: kramdown
+highlighter: rouge
+permalink: /night/:title/
+future: true
+
+# 預設 Front Matter
+defaults:
+  - scope:
+      path: ""
+      type: "posts"
+    values:
+      layout: "post"
+  - scope:
+      path: ""
+      type: "pages"
+    values:
+      layout: "default"
+
+# 網站導覽列
+nav:
+  - title: 首頁
+    url: /
+  - title: 每週睡前冥想
+    url: /#practices
+  - title: 療癒主題
+    url: /tags/
+  - title: 關於睡前正念
+    url: /about/
+
+# 排除檔案
+exclude:
+  - README.md
+  - BEDTIME_MINDFULNESS_GUIDE.md
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor
+  - .git
+  - .gitignore
+
+# 插件（GitHub Pages 原生支援）
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
+  - jekyll-sitemap
+
+# 文章摘要分隔符
+excerpt_separator: <!--more-->

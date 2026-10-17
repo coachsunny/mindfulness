@@ -1,0 +1,1522 @@
+/* ============================================
+   夜嶼靜心 · 睡前正念療癒誌 樣式表
+   架構參考：D:\blog (心茶記)
+   雙主題支援：
+   1. 🌙 睡前微光夜色模式 (data-theme="night"，預設，低藍光護眼助眠)
+   2. ☀️ 日間晨霧暖紙模式 (data-theme="day"，溫潤靜水青黛)
+   ============================================ */
+
+:root,
+html[data-theme="night"] {
+  /* 🌙 睡前微光夜色系統：深邃夜空底 + 溫暖燭光珀色 + 靜水月青 */
+  --bg: hsl(224, 28%, 11%);              /* 靜夜深藍底（不刺眼、護褪黑激素） */
+  --bg-card: hsl(224, 24%, 15.5%);       /* 夜嶼微光卡片底 */
+  --bg-secondary: hsl(224, 26%, 13%);    /* 次級區塊深藍底 */
+  --navbar-bg: hsla(224, 28%, 11%, 0.85);
+  --text: hsl(38, 28%, 88%);             /* 暖月光米白正文 */
+  --text-muted: hsl(220, 15%, 66%);      /* 星霧柔灰輔助字 */
+  --primary: hsl(38, 62%, 64%);          /* 睡前暖燭光金（主色） */
+  --primary-light: hsla(38, 60%, 62%, 0.14);
+  --primary-dark: hsl(38, 72%, 75%);
+  --accent-warm: hsl(172, 40%, 62%);     /* 靜水月青點綴 */
+  --accent-warm-bg: hsla(172, 40%, 55%, 0.14);
+  --border: hsl(222, 20%, 23%);          /* 夜色柔邊框 */
+  --btn-text: hsl(224, 30%, 12%);
+  --shadow: 0 6px 24px hsla(226, 40%, 5%, 0.35),
+            0 1px 4px hsla(226, 40%, 5%, 0.25);
+  --shadow-md: 0 10px 32px hsla(226, 40%, 4%, 0.5),
+               0 3px 10px hsla(226, 40%, 4%, 0.3);
+
+  /* 字體系統 */
+  --font-serif: 'Noto Serif TC', 'Noto Serif SC', 'Source Han Serif TC',
+                'Songti TC', 'BiauKai', Georgia, serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Noto Sans TC', 'Noto Sans SC',
+               'PingFang TC', 'Microsoft JhengHei', sans-serif;
+
+  /* 圓角 */
+  --radius: 14px;
+  --radius-lg: 20px;
+  --radius-full: 9999px;
+}
+
+html[data-theme="day"] {
+  /* ☀️ 日間晨霧暖紙系統：宣紙暖白 + 靜水青黛 + 頌缽暖金 */
+  --bg: hsl(165, 22%, 96.5%);
+  --bg-card: hsl(165, 25%, 99%);
+  --bg-secondary: hsl(168, 22%, 93.5%);
+  --navbar-bg: hsla(165, 22%, 96.5%, 0.85);
+  --text: hsl(180, 18%, 20%);
+  --text-muted: hsl(175, 11%, 43%);
+  --primary: hsl(172, 32%, 35%);
+  --primary-light: hsl(172, 28%, 92%);
+  --primary-dark: hsl(174, 38%, 24%);
+  --accent-warm: hsl(35, 45%, 48%);
+  --accent-warm-bg: hsl(38, 55%, 95%);
+  --border: hsl(168, 16%, 86%);
+  --btn-text: #ffffff;
+  --shadow: 0 4px 20px hsla(175, 25%, 18%, 0.04),
+            0 1px 4px hsla(175, 25%, 18%, 0.02);
+  --shadow-md: 0 8px 28px hsla(175, 25%, 18%, 0.06),
+               0 2px 8px hsla(175, 25%, 18%, 0.04);
+}
+
+/* ---------- 重置與基礎 ---------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.92;
+  letter-spacing: 0.02em;
+  color: var(--text);
+  background-color: var(--bg);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  transition: background-color 0.35s ease, color 0.35s ease;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+main {
+  flex: 1;
+  width: 100%;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.25s ease;
+}
+
+a:hover {
+  color: var(--primary);
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+/* ---------- 容器 ---------- */
+.container {
+  width: 100%;
+  max-width: 740px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.container-wide {
+  width: 100%;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ---------- 頂部導覽列 ---------- */
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  width: 100%;
+  background-color: var(--navbar-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.35s ease;
+}
+
+.navbar.scrolled {
+  border-bottom-color: var(--border);
+  box-shadow: var(--shadow);
+}
+
+.navbar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 68px;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-serif);
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: 0.04em;
+}
+
+.navbar-brand .brand-icon {
+  width: 22px;
+  height: 22px;
+  color: var(--primary);
+}
+
+.navbar-brand .brand-sub {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--text-muted);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding-left: 8px;
+  border-left: 1px solid var(--border);
+}
+
+.navbar-links {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  list-style: none;
+}
+
+.navbar-links a {
+  font-size: 14.5px;
+  color: var(--text-muted);
+  position: relative;
+  padding: 4px 0;
+}
+
+.navbar-links a:hover,
+.navbar-links a.active {
+  color: var(--primary);
+}
+
+.navbar-links a.active {
+  font-weight: 500;
+}
+
+.navbar-links a.active::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 100%;
+  height: 2px;
+  background-color: var(--primary);
+  border-radius: 2px;
+}
+
+.nav-utilities {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.util-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  font-size: 12.5px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  line-height: 1.5;
+}
+
+.util-btn:hover {
+  background-color: var(--primary-light);
+  color: var(--primary);
+  border-color: var(--primary);
+}
+
+.menu-toggle {
+  display: none;
+  padding: 8px;
+  margin-right: -8px;
+  color: var(--text);
+}
+
+.menu-toggle svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* ---------- Hero 區域與睡前呼吸光暈 ---------- */
+.hero {
+  position: relative;
+  padding: 104px 0 112px;
+  text-align: center;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 50% 15%, var(--primary-light), transparent 65%),
+    radial-gradient(ellipse at 20% 85%, var(--accent-warm-bg), transparent 55%);
+  z-index: -2;
+}
+
+.hero-ambient-orb {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 380px;
+  height: 380px;
+  margin-top: -190px;
+  margin-left: -190px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--primary-light) 0%, transparent 70%);
+  z-index: -1;
+  pointer-events: none;
+  animation: mindfulBreathe 10s ease-in-out infinite;
+}
+
+@keyframes mindfulBreathe {
+  0%, 100% {
+    transform: scale(0.85);
+    opacity: 0.4;
+  }
+  40% {
+    transform: scale(1.28);
+    opacity: 0.85;
+  }
+}
+
+.hero-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+  border-radius: var(--radius-full);
+  background-color: var(--primary-light);
+  color: var(--primary);
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 26px;
+  letter-spacing: 0.04em;
+}
+
+.hero-tag svg {
+  width: 15px;
+  height: 15px;
+  color: var(--primary);
+}
+
+.hero-title {
+  font-family: var(--font-serif);
+  font-size: clamp(28px, 5vw, 46px);
+  font-weight: 600;
+  line-height: 1.38;
+  color: var(--text);
+  margin-bottom: 22px;
+  letter-spacing: 0.01em;
+}
+
+.hero-title .accent {
+  color: var(--primary);
+}
+
+.hero-subtitle {
+  font-size: clamp(15px, 2vw, 17px);
+  line-height: 1.95;
+  color: var(--text-muted);
+  max-width: 600px;
+  margin: 0 auto 36px;
+}
+
+.hero-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+/* ---------- 按鈕 ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 11px 24px;
+  border-radius: var(--radius-full);
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.25s ease;
+  cursor: pointer;
+  border: none;
+  line-height: 1.5;
+}
+
+.btn-primary {
+  background-color: var(--primary);
+  color: var(--btn-text);
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-dark);
+  color: var(--btn-text);
+  transform: translateY(-1px);
+}
+
+.btn-outline {
+  background-color: transparent;
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.btn-outline:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background-color: var(--primary-light);
+}
+
+.btn svg {
+  width: 15px;
+  height: 15px;
+}
+
+/* ---------- 區塊通用 ---------- */
+.section {
+  padding: 80px 0;
+}
+
+.structure-section {
+  padding: 64px 0;
+  background-color: var(--bg-secondary);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.section-eyebrow {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--primary);
+  margin-bottom: 10px;
+}
+
+.section-title {
+  font-family: var(--font-serif);
+  font-size: clamp(22px, 3.5vw, 30px);
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 16px;
+}
+
+.section-divider {
+  width: 48px;
+  height: 1.5px;
+  background-color: var(--primary);
+  opacity: 0.45;
+  margin: 0 auto;
+}
+
+/* ---------- 四步曲介紹卡片 ---------- */
+.pillars-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.pillar-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 26px 22px;
+  box-shadow: var(--shadow);
+  transition: all 0.3s ease;
+}
+
+.pillar-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--primary);
+  box-shadow: var(--shadow-md);
+}
+
+.pillar-num {
+  display: inline-block;
+  font-family: var(--font-serif);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--primary);
+  background-color: var(--primary-light);
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  margin-bottom: 14px;
+}
+
+.pillar-title {
+  font-family: var(--font-serif);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 10px;
+}
+
+.pillar-desc {
+  font-size: 14px;
+  line-height: 1.75;
+  color: var(--text-muted);
+}
+
+/* ---------- 每週練習文章卡片 ---------- */
+.post-list {
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+}
+
+.post-card {
+  display: block;
+  padding: 30px 34px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  transition: all 0.3s ease;
+}
+
+.post-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--primary);
+}
+
+.post-card:hover .post-card-title a {
+  color: var(--primary);
+}
+
+.post-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.meta-week {
+  background-color: var(--primary-light);
+  color: var(--primary);
+  font-weight: 600;
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+  font-size: 12px;
+}
+
+.post-card-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.post-card-meta svg {
+  width: 13px;
+  height: 13px;
+}
+
+.post-card-title {
+  font-family: var(--font-serif);
+  font-size: clamp(19px, 2.5vw, 23px);
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--text);
+  margin-bottom: 12px;
+}
+
+.post-card-excerpt {
+  font-size: 15px;
+  line-height: 1.8;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+
+.post-card-quote {
+  font-family: var(--font-serif);
+  font-size: 14.5px;
+  color: var(--text);
+  background-color: var(--primary-light);
+  border-left: 3px solid var(--primary);
+  padding: 10px 14px;
+  border-radius: 0 10px 10px 0;
+  margin-bottom: 16px;
+  line-height: 1.65;
+}
+
+.post-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.post-card-readmore {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 18px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--primary);
+  transition: all 0.25s ease;
+}
+
+.post-card:hover .post-card-readmore {
+  transform: translateX(4px);
+}
+
+.post-card-readmore svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* ---------- 標籤 ---------- */
+.tag {
+  display: inline-block;
+  padding: 3px 12px;
+  border-radius: var(--radius-full);
+  background-color: var(--primary-light);
+  color: var(--primary);
+  font-size: 12px;
+  line-height: 1.6;
+  transition: all 0.2s ease;
+}
+
+.tag-week {
+  background-color: var(--accent-warm-bg);
+  color: var(--accent-warm);
+  font-weight: 600;
+}
+
+a.tag:hover {
+  opacity: 0.85;
+}
+
+/* ---------- 引言金句區 ---------- */
+.quote-section {
+  padding: 68px 0;
+  background-color: var(--bg-secondary);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.quote-text {
+  font-family: var(--font-serif);
+  font-size: clamp(18px, 3vw, 24px);
+  line-height: 1.75;
+  color: var(--text);
+  text-align: center;
+  max-width: 580px;
+  margin: 0 auto;
+}
+
+.quote-author {
+  text-align: center;
+  font-size: 13.5px;
+  color: var(--text-muted);
+  margin-top: 20px;
+}
+
+/* ---------- 文章詳情與內建睡前計時器 ---------- */
+.post-header-bar {
+  position: sticky;
+  top: 68px;
+  z-index: 90;
+  background-color: var(--navbar-bg);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border);
+}
+
+.post-header-bar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 48px;
+}
+
+.week-pill {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--primary);
+  background-color: var(--primary-light);
+  padding: 3px 12px;
+  border-radius: var(--radius-full);
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 14px;
+  color: var(--text-muted);
+  padding: 4px 8px;
+  margin-left: -8px;
+  border-radius: 6px;
+}
+
+.back-link:hover {
+  color: var(--primary);
+  background-color: var(--primary-light);
+}
+
+.back-link svg {
+  width: 16px;
+  height: 16px;
+}
+
+.post-article {
+  padding: 48px 0 80px;
+}
+
+.post-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.post-title {
+  font-family: var(--font-serif);
+  font-size: clamp(24px, 4vw, 36px);
+  font-weight: 600;
+  line-height: 1.38;
+  color: var(--text);
+  margin-bottom: 22px;
+}
+
+.post-meta {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  font-size: 14px;
+  color: var(--text-muted);
+  padding-bottom: 28px;
+  margin-bottom: 36px;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.post-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.post-meta svg {
+  width: 15px;
+  height: 15px;
+  color: var(--primary);
+}
+
+/* 隨身睡前正念計時與 4-6 助眠呼吸引導器 */
+.mindful-timer-card {
+  margin: 0 0 44px;
+  padding: 28px 30px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+}
+
+.timer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 22px;
+}
+
+.timer-title-wrap {
+  flex: 1;
+}
+
+.timer-badge {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent-warm);
+  background-color: var(--accent-warm-bg);
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  margin-bottom: 8px;
+}
+
+.timer-title {
+  font-family: var(--font-serif);
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.timer-subtitle {
+  font-size: 13.5px;
+  color: var(--text-muted);
+  line-height: 1.65;
+}
+
+.breath-visualizer {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.breath-circle {
+  position: absolute;
+  inset: 10px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--primary-light), transparent);
+  border: 1.5px solid var(--primary);
+  transition: transform 0.6s ease;
+}
+
+.breath-visualizer.active .breath-circle {
+  /* 4秒吸氣膨脹 + 6秒吐氣緩慢收縮（10秒一循環助眠節律） */
+  animation: breathCycle 10s ease-in-out infinite;
+}
+
+@keyframes breathCycle {
+  0%, 100% {
+    transform: scale(0.76);
+    opacity: 0.55;
+  }
+  40% {
+    transform: scale(1.22);
+    opacity: 1;
+  }
+}
+
+.breath-label {
+  position: relative;
+  z-index: 1;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--primary);
+  text-align: center;
+}
+
+.timer-controls {
+  border-top: 1px solid var(--border);
+  padding-top: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.timer-options-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.duration-presets {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.preset-btn {
+  padding: 5px 14px;
+  font-size: 13px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border);
+  background-color: var(--bg);
+  color: var(--text-muted);
+  transition: all 0.2s ease;
+}
+
+.preset-btn:hover,
+.preset-btn.active {
+  background-color: var(--primary);
+  color: var(--btn-text);
+  border-color: var(--primary);
+}
+
+.sleep-silent-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-muted);
+  cursor: pointer;
+  user-select: none;
+}
+
+.sleep-silent-toggle input {
+  accent-color: var(--primary);
+  width: 15px;
+  height: 15px;
+}
+
+.timer-action-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.timer-display {
+  font-family: var(--font-serif);
+  font-size: 32px;
+  font-weight: 600;
+  color: var(--primary);
+  letter-spacing: 0.05em;
+  min-width: 100px;
+}
+
+.timer-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* 正文排版 */
+.post-content {
+  font-size: 16.5px;
+  line-height: 1.95;
+  letter-spacing: 0.02em;
+  color: var(--text);
+  word-break: break-word;
+}
+
+.post-content > h1:first-child {
+  display: none;
+}
+
+.post-content p {
+  margin-bottom: 24px;
+}
+
+.post-content h2 {
+  font-family: var(--font-serif);
+  font-size: clamp(20px, 3vw, 24px);
+  font-weight: 600;
+  color: var(--primary);
+  margin-top: 52px;
+  margin-bottom: 20px;
+  padding-left: 14px;
+  border-left: 3.5px solid var(--primary);
+  line-height: 1.45;
+}
+
+.post-content h2:first-of-type {
+  margin-top: 12px;
+}
+
+.post-content h3 {
+  font-family: var(--font-serif);
+  font-size: clamp(17px, 2.4vw, 20px);
+  font-weight: 600;
+  color: var(--text);
+  margin-top: 34px;
+  margin-bottom: 14px;
+}
+
+.post-content blockquote {
+  margin: 32px 0;
+  padding: 22px 26px;
+  border-left: 4px solid var(--primary);
+  background-color: var(--primary-light);
+  border-radius: 0 14px 14px 0;
+  font-family: var(--font-serif);
+  font-size: 16.5px;
+  color: var(--text);
+  line-height: 1.9;
+}
+
+.post-content blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+.post-content ul,
+.post-content ol {
+  margin: 18px 0 26px;
+  padding-left: 26px;
+}
+
+.post-content li {
+  margin-bottom: 10px;
+  line-height: 1.85;
+}
+
+/* 學理卡片與睡前練習步驟盒 */
+.theory-box {
+  margin: 28px 0;
+  padding: 24px 28px;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+.practice-step-box {
+  margin: 24px 0;
+  padding: 24px 28px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent-warm);
+  border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
+  box-shadow: var(--shadow);
+}
+
+/* 專屬：最後一句睡前正念話語卡片 */
+.mindful-quote-card {
+  margin: 56px 0 32px;
+  padding: 40px 36px;
+  text-align: center;
+  background-color: var(--bg-card);
+  border: 1px solid var(--primary);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.mindful-quote-eyebrow {
+  display: inline-block;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--primary);
+  background-color: var(--primary-light);
+  padding: 4px 14px;
+  border-radius: var(--radius-full);
+  margin-bottom: 20px;
+}
+
+.mindful-quote-text {
+  font-family: var(--font-serif);
+  font-size: clamp(20px, 3vw, 26px);
+  font-weight: 600;
+  line-height: 1.65;
+  color: var(--text);
+  max-width: 580px;
+  margin: 0 auto 16px;
+}
+
+.mindful-quote-note {
+  font-size: 13.5px;
+  color: var(--text-muted);
+}
+
+/* ---------- 關於頁與標籤頁 ---------- */
+.about-hero {
+  padding: 80px 0 64px;
+  text-align: center;
+}
+
+.about-avatar {
+  position: relative;
+  width: 152px;
+  height: 152px;
+  margin: 0 auto 36px;
+}
+
+.about-avatar img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center 20%;
+  border: 4px solid var(--bg-card);
+  box-shadow: var(--shadow-md);
+}
+
+.about-bio {
+  text-align: left;
+  font-size: 16px;
+  line-height: 1.9;
+}
+
+.about-bio p {
+  margin-bottom: 18px;
+}
+
+.about-bio ul {
+  margin: 16px 0 24px;
+  padding-left: 24px;
+}
+
+.about-bio li {
+  margin-bottom: 10px;
+}
+
+.values-section {
+  background-color: var(--bg-secondary);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.values-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.value-card {
+  padding: 28px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+.value-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: var(--primary-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.value-icon svg {
+  width: 20px;
+  height: 20px;
+  color: var(--primary);
+}
+
+.value-title {
+  font-family: var(--font-serif);
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.value-desc {
+  font-size: 14px;
+  line-height: 1.75;
+  color: var(--text-muted);
+}
+
+/* 標籤雲與分類 */
+.tag-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 40px;
+}
+
+.tag-lg {
+  font-size: 14px;
+  padding: 6px 16px;
+}
+
+.tag-count {
+  display: inline-block;
+  background-color: var(--primary);
+  color: var(--btn-text);
+  font-size: 11px;
+  padding: 1px 7px;
+  border-radius: var(--radius-full);
+  margin-left: 6px;
+}
+
+.tag-section {
+  margin-bottom: 44px;
+  padding-bottom: 36px;
+  border-bottom: 1px solid var(--border);
+}
+
+.tag-section-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.tag-section-title {
+  font-family: var(--font-serif);
+  font-size: 21px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tag-section-title svg {
+  width: 19px;
+  height: 19px;
+  color: var(--primary);
+}
+
+.tag-section-count {
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+
+.tag-post-list {
+  display: grid;
+  gap: 12px;
+}
+
+.tag-post-item {
+  display: block;
+  padding: 16px 20px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  transition: all 0.2s ease;
+}
+
+.tag-post-item:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+}
+
+.tag-post-date {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.tag-post-date svg {
+  width: 13px;
+  height: 13px;
+}
+
+.tag-post-title {
+  font-family: var(--font-serif);
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+
+.tag-post-excerpt {
+  font-size: 13.5px;
+  color: var(--text-muted);
+}
+
+/* 上下篇導覽與返回 */
+.back-to-list {
+  text-align: center;
+  margin-top: 44px;
+}
+
+.back-to-list a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: var(--primary);
+  padding: 8px 18px;
+  border-radius: var(--radius-full);
+  background-color: var(--primary-light);
+}
+
+.back-to-list svg {
+  width: 14px;
+  height: 14px;
+}
+
+.post-nav {
+  margin-top: 56px;
+  padding-top: 32px;
+  border-top: 1px solid var(--border);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.post-nav-card {
+  display: block;
+  padding: 16px 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background-color: var(--bg-card);
+}
+
+.post-nav-card.next {
+  text-align: right;
+}
+
+.post-nav-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.post-nav-card.next .post-nav-label {
+  justify-content: flex-end;
+}
+
+.post-nav-label svg {
+  width: 14px;
+  height: 14px;
+}
+
+.post-nav-title {
+  font-family: var(--font-serif);
+  font-size: 15px;
+  font-weight: 500;
+}
+
+/* ---------- 頁尾與彈窗 ---------- */
+.footer {
+  margin-top: 80px;
+  padding: 40px 0;
+  border-top: 1px solid var(--border);
+  background-color: var(--bg-secondary);
+}
+
+.footer-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  text-align: center;
+}
+
+.footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-serif);
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.footer-brand svg {
+  width: 16px;
+  height: 16px;
+  color: var(--primary);
+}
+
+.footer-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.footer-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  padding: 5px 14px;
+}
+
+.footer-btn svg {
+  width: 15px;
+  height: 15px;
+  color: var(--primary);
+}
+
+.footer-email {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13.5px;
+  color: var(--text-muted);
+}
+
+.footer-email svg {
+  width: 14px;
+  height: 14px;
+}
+
+.footer-copy {
+  font-size: 12px;
+  color: var(--text-muted);
+  opacity: 0.75;
+}
+
+.back-to-top {
+  position: fixed;
+  right: 24px;
+  bottom: 32px;
+  z-index: 90;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-color: var(--primary);
+  color: var(--btn-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-md);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(12px);
+  transition: all 0.3s ease;
+}
+
+.back-to-top.visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.back-to-top svg {
+  width: 18px;
+  height: 18px;
+}
+
+.wechat-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  background-color: hsla(0, 0%, 0%, 0.6);
+  backdrop-filter: blur(4px);
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.wechat-modal.active {
+  display: flex;
+}
+
+.wechat-modal-box {
+  background-color: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: 32px 28px;
+  max-width: 360px;
+  width: 100%;
+  text-align: center;
+  position: relative;
+  border: 1px solid var(--border);
+}
+
+.wechat-modal-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  color: var(--text-muted);
+  padding: 6px;
+}
+
+.wechat-modal-title {
+  font-family: var(--font-serif);
+  font-size: 19px;
+  margin-bottom: 8px;
+}
+
+.wechat-modal-desc {
+  font-size: 13.5px;
+  color: var(--text-muted);
+  margin-bottom: 18px;
+}
+
+.wechat-modal-qr {
+  width: 180px;
+  height: 180px;
+  margin: 0 auto 12px;
+  padding: 8px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+/* ---------- 動畫與響應式 ---------- */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in { animation: fadeInUp 0.6s ease both; }
+.fade-in-delay-1 { animation-delay: 0.1s; }
+.fade-in-delay-2 { animation-delay: 0.2s; }
+.fade-in-delay-3 { animation-delay: 0.3s; }
+
+@media (max-width: 820px) {
+  .pillars-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .navbar-brand .brand-sub {
+    display: none;
+  }
+  .menu-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .navbar-links {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    background-color: var(--bg-card);
+    border-bottom: 1px solid var(--border);
+    padding: 8px 20px 20px;
+    display: none;
+  }
+  .navbar-links.open {
+    display: flex;
+  }
+  .navbar-links li {
+    border-bottom: 1px solid var(--border);
+  }
+  .navbar-links li:last-child {
+    border-bottom: none;
+    padding-top: 12px;
+  }
+  .navbar-links a {
+    display: block;
+    padding: 14px 4px;
+  }
+  .pillars-grid,
+  .values-grid,
+  .post-nav {
+    grid-template-columns: 1fr;
+  }
+  .timer-header {
+    flex-direction: column;
+    text-align: center;
+  }
+  .post-card {
+    padding: 22px 20px;
+  }
+  .mindful-quote-card {
+    padding: 28px 20px;
+  }
+}

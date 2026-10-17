@@ -1,0 +1,152 @@
+---
+layout: default
+title: 首頁
+description: 夜嶼靜心 · 每週為自己保留 10~15 分鐘的睡前正念冥想時光。透過睡前靜心小文、睡眠與正念腦科學學理、躺姿微冥想引導與晚安正念話語，溫柔卸下一天的疲憊，安然入眠。
+---
+
+<!-- Hero 區域：夜色星嶼與助眠呼吸光暈 -->
+<section class="hero">
+  <div class="hero-ambient-orb" aria-hidden="true"></div>
+  <div class="container">
+    <div class="hero-tag fade-in">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
+      </svg>
+      每週 10～15 分鐘 · 睡前正念冥想療癒
+    </div>
+    <h1 class="hero-title fade-in fade-in-delay-1">
+      在夜深閉眼之前，<br/>
+      把白天的紛擾<span class="accent">溫柔歸還給黑夜</span>
+    </h1>
+    <p class="hero-subtitle fade-in fade-in-delay-2">
+      白天，我們總是努力扮演好每一個角色；到了夜晚躺上床，頭腦卻常常還在加班。<br/>
+      每週給自己一個 10 到 15 分鐘的睡前正念儀式——<br/>
+      讀一篇睡前靜心小文、明白大腦放鬆的學理、跟著引導躺在床上做一段冥想，<br/>
+      帶著最後一句晚安正念話語，安穩滑入夢鄉。
+    </p>
+    <div class="hero-buttons fade-in fade-in-delay-3">
+      <a href="#practices" class="btn btn-primary">
+        進入今夜睡前冥想
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 12h14"/>
+          <path d="m12 5 7 7-7 7"/>
+        </svg>
+      </a>
+      <a href="#structure" class="btn btn-outline">
+        了解睡前四步曲
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- 睡前正念四步曲介紹 -->
+<section id="structure" class="section structure-section">
+  <div class="container-wide">
+    <div class="section-header scroll-fade">
+      <p class="section-eyebrow">Bedtime 4-Step Ritual</p>
+      <h2 class="section-title">每週睡前正念冥想的四個片刻</h2>
+      <div class="section-divider"></div>
+    </div>
+
+    <div class="pillars-grid">
+      <div class="pillar-card scroll-fade">
+        <span class="pillar-num">01 · 靜心導讀</span>
+        <h3 class="pillar-title">睡前正念小文章</h3>
+        <p class="pillar-desc">在關燈前的微光裡讀一段溫柔隨筆，陪你從白天的「做事模式」切換回夜晚的「同在與放下模式」。</p>
+      </div>
+      <div class="pillar-card scroll-fade">
+        <span class="pillar-num">02 · 溫柔學理</span>
+        <h3 class="pillar-title">背後的簡要學理</h3>
+        <p class="pillar-desc">結合睡眠神經科學、迷走神經調節與 MBSR/MBCT 正念學理，理解「為什麼這個睡前練習能讓大腦降溫」。</p>
+      </div>
+      <div class="pillar-card scroll-fade">
+        <span class="pillar-num">03 · 睡前冥想</span>
+        <h3 class="pillar-title">10～15 分鐘冥想引導</h3>
+        <p class="pillar-desc">專為「躺在床上」或「床邊坐姿」設計的 3 階段冥想步驟，搭配頁面內建的助眠呼吸光圈與靜音入睡計時器。</p>
+      </div>
+      <div class="pillar-card scroll-fade">
+        <span class="pillar-num">04 · 晚安錨點</span>
+        <h3 class="pillar-title">最後一句正念話語</h3>
+        <p class="pillar-desc">放下手機、閉上雙眼時對自己輕聲說的一句「晚安正念語」，讓潛意識在安全與接納中入眠。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 每週睡前正念活動列表 -->
+<section id="practices" class="section">
+  <div class="container">
+    <div class="section-header scroll-fade">
+      <p class="section-eyebrow">Weekly Bedtime Meditations</p>
+      <h2 class="section-title">每週睡前正念療癒活動</h2>
+      <div class="section-divider"></div>
+    </div>
+
+    <div class="post-list">
+      {% for post in site.posts %}
+      <div class="post-card scroll-fade">
+        <div class="post-card-meta">
+          {% if post.week %}
+          <span class="meta-week">🌙 Week {{ post.week }}</span>
+          {% endif %}
+          <span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect width="18" height="18" x="3" y="4" rx="2"/>
+              <path d="M16 2v4"/>
+              <path d="M8 2v4"/>
+              <path d="M3 10h18"/>
+            </svg>
+            {{ post.date | date: '%Y 年 %m 月 %d 日' }}
+          </span>
+          <span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
+            睡前冥想 {{ post.practice_duration | default: '10~15 分鐘' }}
+          </span>
+          {% if post.posture %}
+          <span>🛏️ {{ post.posture }}</span>
+          {% endif %}
+        </div>
+
+        <h3 class="post-card-title"><a href="{{ post.url | relative_url }}">{{ post.title }}</a></h3>
+        <p class="post-card-excerpt">{{ post.description | default: post.excerpt | strip_html | truncate: 130 }}</p>
+
+        {% if post.mindful_quote %}
+        <div class="post-card-quote">
+          <span>🌙 睡前正念話語：</span>「{{ post.mindful_quote }}」
+        </div>
+        {% endif %}
+
+        {% if post.tags %}
+        <div class="post-card-tags">
+          {% for tag in post.tags %}
+          <a href="{{ '/tags/' | relative_url }}#tag-{{ tag | slugify }}" class="tag">{{ tag }}</a>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        <a href="{{ post.url | relative_url }}" class="post-card-readmore">
+          進入今夜冥想練習
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12h14"/>
+            <path d="m12 5 7 7-7 7"/>
+          </svg>
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- 靜心引言區 -->
+<section class="quote-section">
+  <div class="container">
+    <blockquote class="quote-text scroll-fade">
+      「睡眠不是你可以用意志力強迫發生的事；<br/>
+      但當你放下對白天的抓緊，睡眠便會自己向你走來。」
+    </blockquote>
+    <p class="quote-author">— 夜嶼靜心 · 睡前正念療癒誌</p>
+  </div>
+</section>

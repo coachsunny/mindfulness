@@ -1,0 +1,184 @@
+---
+layout: default
+---
+
+<!-- 結構化資料（JSON-LD） -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": {{ page.title | jsonify }},
+  "description": {{ page.description | default: page.excerpt | strip_html | jsonify }},
+  "datePublished": "{{ page.date | date_to_xmlschema }}",
+  "dateModified": "{{ page.date | date_to_xmlschema }}",
+  "author": {
+    "@type": "Person",
+    "name": "{{ site.author }}",
+    "url": "{{ '/about/' | prepend: site.url | prepend: site.baseurl }}"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "{{ site.title }}",
+    "url": "{{ '/' | prepend: site.url | prepend: site.baseurl }}"
+  }
+}
+</script>
+
+<!-- 返回導覽列 -->
+<div class="post-header-bar">
+  <div class="container post-header-bar-inner">
+    <a href="{{ '/#practices' | relative_url }}" class="back-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="m12 19-7-7 7-7"/>
+        <path d="M19 12H5"/>
+      </svg>
+      返回每週睡前冥想列表
+    </a>
+    {% if page.week %}
+    <span class="week-pill">🌙 Week {{ page.week }} · 睡前正念冥想</span>
+    {% endif %}
+  </div>
+</div>
+
+<!-- 文章與睡前正念活動主體 -->
+<article class="post-article">
+  <div class="container">
+    <div class="post-tags">
+      {% if page.week %}
+      <span class="tag tag-week">第 {{ page.week }} 週</span>
+      {% endif %}
+      {% if page.tags %}
+        {% for tag in page.tags %}
+        <a href="{{ '/tags/' | relative_url }}#tag-{{ tag | slugify }}" class="tag">{{ tag }}</a>
+        {% endfor %}
+      {% endif %}
+    </div>
+
+    <h1 class="post-title">{{ page.title }}</h1>
+
+    <div class="post-meta">
+      <span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect width="18" height="18" x="3" y="4" rx="2"/>
+          <path d="M16 2v4"/>
+          <path d="M8 2v4"/>
+          <path d="M3 10h18"/>
+        </svg>
+        {{ page.date | date: '%Y 年 %m 月 %d 日' }}
+      </span>
+      <span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
+        </svg>
+        睡前冥想：{{ page.practice_duration | default: '10~15 分鐘' }}
+      </span>
+      {% if page.posture %}
+      <span>
+        🛏️ 建議姿勢：{{ page.posture }}
+      </span>
+      {% endif %}
+    </div>
+
+    <!-- 內建睡前正念計時與 4-6 助眠呼吸引導器 -->
+    <div class="mindful-timer-card" id="mindfulTimer">
+      <div class="timer-header">
+        <div class="timer-title-wrap">
+          <span class="timer-badge">🌙 睡前助眠冥想伴侶</span>
+          <h3 class="timer-title">10～15 分鐘睡前靜心計時器</h3>
+          <p class="timer-subtitle">先閱讀完下方的引導步驟，調暗房內燈光、舒服躺好後，按下「開始睡前冥想」。可勾選「結束時靜音直接入睡」，避免結束鈴聲打擾睡意。</p>
+        </div>
+        <div class="breath-visualizer" id="breathVisualizer" aria-hidden="true">
+          <div class="breath-circle"></div>
+          <span class="breath-label" id="breathLabel">吸 4 · 吐 6</span>
+        </div>
+      </div>
+
+      <div class="timer-controls">
+        <div class="timer-options-row">
+          <div class="duration-presets" role="group" aria-label="選擇睡前冥想時間">
+            <button type="button" class="preset-btn" data-minutes="10">10 分鐘</button>
+            <button type="button" class="preset-btn active" data-minutes="12">12 分鐘</button>
+            <button type="button" class="preset-btn" data-minutes="15">15 分鐘</button>
+          </div>
+          <label class="sleep-silent-toggle" title="勾選後，計時結束時不敲響頌缽，讓你直接安然入睡">
+            <input type="checkbox" id="silentEndCheck" checked />
+            <span>🌙 結束時靜音（直接入睡不喚醒）</span>
+          </label>
+        </div>
+
+        <div class="timer-action-row">
+          <div class="timer-display" id="timerDisplay">12:00</div>
+          <div class="timer-buttons">
+            <button type="button" class="btn btn-primary timer-start-btn" id="timerStartBtn">
+              開始睡前冥想
+            </button>
+            <button type="button" class="btn btn-outline timer-reset-btn" id="timerResetBtn">
+              重置
+            </button>
+            <button type="button" class="btn btn-outline timer-bell-btn" id="timerBellBtn" title="試聽入夜頌缽泛音">
+              🔔 試聽頌缽
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 正文（四段式結構：1.正念小文章 → 2.背後簡要學理 → 3.10~15分鐘睡前冥想活動 → 4.最後一句正念話語） -->
+    <div class="post-content">
+      {{ content }}
+    </div>
+
+    {% if page.mindful_quote %}
+    <!-- 專屬：最後一句睡前正念話語卡片 -->
+    <div class="mindful-quote-card">
+      <div class="mindful-quote-eyebrow">🌙 今夜睡前正念話語 · Bedtime Mantra</div>
+      <blockquote class="mindful-quote-text">
+        「{{ page.mindful_quote }}」
+      </blockquote>
+      <p class="mindful-quote-note">現在，請放下手機、閉上雙眼，在心裡伴隨吐氣輕輕對自己說這句話。晚安。</p>
+    </div>
+    {% endif %}
+
+    <!-- 返回列表 -->
+    <div class="back-to-list">
+      <a href="{{ '/#practices' | relative_url }}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m12 19-7-7 7-7"/>
+          <path d="M19 12H5"/>
+        </svg>
+        返回每週睡前冥想列表
+      </a>
+    </div>
+
+    <!-- 上下篇導覽 -->
+    <div class="post-nav">
+      {% if page.previous %}
+      <a href="{{ page.previous.url | relative_url }}" class="post-nav-card prev">
+        <div class="post-nav-label">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m15 18-6-6 6-6"/>
+          </svg>
+          上一週睡前練習
+        </div>
+        <p class="post-nav-title">{{ page.previous.title }}</p>
+      </a>
+      {% else %}
+      <div class="post-nav-empty"></div>
+      {% endif %}
+
+      {% if page.next %}
+      <a href="{{ page.next.url | relative_url }}" class="post-nav-card next">
+        <div class="post-nav-label">
+          下一週睡前練習
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m9 18 6-6-6-6"/>
+          </svg>
+        </div>
+        <p class="post-nav-title">{{ page.next.title }}</p>
+      </a>
+      {% else %}
+      <div class="post-nav-empty"></div>
+      {% endif %}
+    </div>
+  </div>
+</article>
