@@ -79,13 +79,13 @@ layout: default
       {% endif %}
     </div>
 
-    <!-- 內建睡前正念計時與 4-6 助眠呼吸引導器 -->
+    <!-- 內建睡前正念計時、閉眼語音引導與 4-6 助眠呼吸器 -->
     <div class="mindful-timer-card" id="mindfulTimer">
       <div class="timer-header">
         <div class="timer-title-wrap">
-          <span class="timer-badge">🌙 睡前助眠冥想伴侶</span>
-          <h3 class="timer-title">10～15 分鐘睡前靜心計時器</h3>
-          <p class="timer-subtitle">先閱讀完下方的引導步驟，調暗房內燈光、舒服躺好後，按下「開始睡前冥想」。可勾選「結束時靜音直接入睡」，避免結束鈴聲打擾睡意。</p>
+          <span class="timer-badge">🌙 睡前閉眼冥想引導伴侶</span>
+          <h3 class="timer-title">10～15 分鐘睡前語音引導與靜心計時器</h3>
+          <p class="timer-subtitle">先調整好舒服的躺姿，按下「開始睡前冥想」後即可放下手機、閉上雙眼。系統會隨時間階段自動以溫柔慢速語音（或階段頌缽微音）引導你逐步放鬆，並在最後直接伴你入眠。</p>
         </div>
         <div class="breath-visualizer" id="breathVisualizer" aria-hidden="true">
           <div class="breath-circle"></div>
@@ -93,7 +93,46 @@ layout: default
         </div>
       </div>
 
+      <!-- 即時引導語字幕顯示區 -->
+      <div class="live-guidance-box" id="liveGuidanceBox">
+        <div class="live-guidance-header">
+          <span class="live-stage-tag" id="liveStageTag">✨ 準備開始 · 睡前引導語預覽</span>
+          <button type="button" class="test-voice-btn" id="testVoiceBtn" title="試聽語音引導的音量與語速">
+            🔊 試聽引導語音
+          </button>
+        </div>
+        <p class="live-guidance-text" id="liveGuidanceText">
+          {% if page.guidance_script and page.guidance_script.first %}
+            「{{ page.guidance_script.first.text }}」
+          {% else %}
+            「現在，請用最舒服的姿勢平躺在床上，輕輕閉上雙眼，把白天的重量交給床鋪……」
+          {% endif %}
+        </p>
+      </div>
+
+      <!-- 隱藏儲存本週各階段引導語資料（支援 OpenCC 繁簡自動轉換後讀取） -->
+      {% if page.guidance_script %}
+      <div id="guidanceScriptData" style="display:none;" aria-hidden="true">
+        {% for item in page.guidance_script %}
+        <div class="guidance-cue-item" data-pct="{{ item.time_pct }}">
+          <span class="cue-stage">{{ item.stage }}</span>
+          <span class="cue-text">{{ item.text }}</span>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
       <div class="timer-controls">
+        <!-- 導引模式選擇 -->
+        <div class="guidance-mode-row">
+          <span class="mode-label">引導方式：</span>
+          <div class="guidance-modes" role="group" aria-label="選擇閉眼引導方式">
+            <button type="button" class="mode-btn active" data-mode="voice">🗣️ 溫柔語音＋頌缽引導（推薦）</button>
+            <button type="button" class="mode-btn" data-mode="bell">🔔 僅階段頌缽微音</button>
+            <button type="button" class="mode-btn" data-mode="silent">🤫 純靜音計時</button>
+          </div>
+        </div>
+
         <div class="timer-options-row">
           <div class="duration-presets" role="group" aria-label="選擇睡前冥想時間">
             <button type="button" class="preset-btn" data-minutes="10">10 分鐘</button>
@@ -123,7 +162,7 @@ layout: default
       </div>
     </div>
 
-    <!-- 正文（四段式結構：1.正念小文章 → 2.背後簡要學理 → 3.10~15分鐘睡前冥想活動 → 4.最後一句正念話語） -->
+    <!-- 正文（四段式結構：1.正念小文章 → 2.背後簡要學理 → 3.10~15分鐘睡前冥想活動與完整引導語 → 4.最後一句正念話語） -->
     <div class="post-content">
       {{ content }}
     </div>

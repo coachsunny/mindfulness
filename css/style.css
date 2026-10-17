@@ -826,12 +826,99 @@ a.tag:hover {
   text-align: center;
 }
 
+/* 即時引導語字幕窗 */
+.live-guidance-box {
+  margin-bottom: 20px;
+  padding: 18px 22px;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-left: 3.5px solid var(--primary);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  transition: all 0.4s ease;
+}
+
+.live-guidance-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.live-stage-tag {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--primary);
+  letter-spacing: 0.04em;
+}
+
+.test-voice-btn {
+  font-size: 12px;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  background-color: var(--bg-card);
+  transition: all 0.2s ease;
+}
+
+.test-voice-btn:hover {
+  color: var(--primary);
+  border-color: var(--primary);
+}
+
+.live-guidance-text {
+  font-family: var(--font-serif);
+  font-size: 15.5px;
+  line-height: 1.8;
+  color: var(--text);
+  margin: 0;
+}
+
 .timer-controls {
   border-top: 1px solid var(--border);
   padding-top: 18px;
   display: flex;
   flex-direction: column;
   gap: 16px;
+}
+
+.guidance-mode-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.mode-label {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.guidance-modes {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.mode-btn {
+  padding: 5px 13px;
+  font-size: 12.5px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border);
+  background-color: var(--bg);
+  color: var(--text-muted);
+  transition: all 0.2s ease;
+}
+
+.mode-btn:hover,
+.mode-btn.active {
+  background-color: var(--accent-warm-bg);
+  color: var(--accent-warm);
+  border-color: var(--accent-warm);
+  font-weight: 600;
 }
 
 .timer-options-row {
@@ -990,6 +1077,34 @@ a.tag:hover {
   border-left: 4px solid var(--accent-warm);
   border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
   box-shadow: var(--shadow);
+}
+
+.guidance-script-quote {
+  margin-top: 16px;
+  padding: 18px 22px;
+  background-color: var(--bg-secondary);
+  border: 1px dashed var(--primary);
+  border-radius: var(--radius);
+  font-family: var(--font-serif);
+  font-size: 16px;
+  line-height: 2;
+  color: var(--text);
+}
+
+.guidance-script-quote .script-label {
+  display: block;
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--primary);
+  margin-bottom: 8px;
+  letter-spacing: 0.05em;
+}
+
+.guidance-script-quote .pause-hint {
+  color: var(--text-muted);
+  font-size: 14px;
+  font-style: normal;
 }
 
 /* 專屬：最後一句睡前正念話語卡片 */

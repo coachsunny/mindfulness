@@ -17,3 +17,8 @@ Thumbs.db
 *~
 .vscode/
 .idea/
+
+# 社群宣發與本地配圖素材（僅本地保留）
+social_assets/
+social_posts/
+
