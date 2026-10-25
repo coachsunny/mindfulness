@@ -97,8 +97,8 @@ layout: default
       <div class="live-guidance-box" id="liveGuidanceBox">
         <div class="live-guidance-header">
           <span class="live-stage-tag" id="liveStageTag">✨ 準備開始 · 睡前引導語預覽</span>
-          <button type="button" class="test-voice-btn" id="testVoiceBtn" title="試聽語音引導的音量與語速">
-            🔊 試聽引導語音
+          <button type="button" class="test-voice-btn" id="testVoiceBtn" title="試聽或隨時點擊朗讀當前引導語">
+            🔊 試聽 / 朗讀此段語音
           </button>
         </div>
         <p class="live-guidance-text" id="liveGuidanceText">
@@ -108,6 +108,10 @@ layout: default
             「現在，請用最舒服的姿勢平躺在床上，輕輕閉上雙眼，把白天的重量交給床鋪……」
           {% endif %}
         </p>
+        <div class="voice-hint-bar" id="voiceHintBar">
+          <span class="voice-hint-icon">💡</span>
+          <span class="voice-hint-text"><strong>聽不到語音？</strong>iPhone 請務必檢查手機側邊實體<strong>靜音撥片是否關閉（紅色為靜音）</strong>並調大音量；微信內若被限制發聲，可點右上角「…」選擇<strong>「在瀏覽器打開（Safari / Chrome）」</strong>。</span>
+        </div>
       </div>
 
       <!-- 隱藏儲存本週各階段引導語資料（支援 OpenCC 繁簡自動轉換後讀取） -->
@@ -127,7 +131,7 @@ layout: default
         <div class="guidance-mode-row">
           <span class="mode-label">引導方式：</span>
           <div class="guidance-modes" role="group" aria-label="選擇閉眼引導方式">
-            <button type="button" class="mode-btn active" data-mode="voice">🗣️ 溫柔語音＋頌缽引導（推薦）</button>
+            <button type="button" class="mode-btn active" data-mode="voice">🗣️ 智者男聲＋頌缽引導（推薦）</button>
             <button type="button" class="mode-btn" data-mode="bell">🔔 僅階段頌缽微音</button>
             <button type="button" class="mode-btn" data-mode="silent">🤫 純靜音計時</button>
           </div>

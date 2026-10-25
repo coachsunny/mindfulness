@@ -876,6 +876,29 @@ a.tag:hover {
   margin: 0;
 }
 
+.voice-hint-bar {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 14px;
+  padding: 8px 12px;
+  background-color: var(--bg-card);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+
+.voice-hint-icon {
+  flex-shrink: 0;
+  font-size: 13px;
+}
+
+.voice-hint-text strong {
+  color: var(--accent-warm);
+}
+
 .timer-controls {
   border-top: 1px solid var(--border);
   padding-top: 18px;

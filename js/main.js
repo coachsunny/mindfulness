@@ -126,12 +126,25 @@
   }
 
   // ---------- 7. Web Audio 合成溫柔睡前低頻頌缽泛音 ----------
+  let sharedAudioCtx = null;
+  function getSharedAudioContext() {
+    if (!sharedAudioCtx) {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (AudioCtx) {
+        sharedAudioCtx = new AudioCtx();
+      }
+    }
+    if (sharedAudioCtx && sharedAudioCtx.state === 'suspended') {
+      try { sharedAudioCtx.resume(); } catch (e) {}
+    }
+    return sharedAudioCtx;
+  }
+
   function playSingingBowl(volumeScale) {
     const scale = typeof volumeScale === 'number' ? volumeScale : 1.0;
     try {
-      const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      if (!AudioCtx) return;
-      const ctx = new AudioCtx();
+      const ctx = getSharedAudioContext();
+      if (!ctx) return;
       const now = ctx.currentTime;
 
       // 睡前溫暖低頻泛音列（174Hz / 285Hz / 432Hz 舒緩頻率）
@@ -158,79 +171,213 @@
     }
   }
 
-  // ---------- 8. Web Speech API 溫柔慢速語音引導器 ----------
+  // ---------- 8. Web Speech API 智者老者磁性慢速語音引導器 ----------
   let speechTimeoutIds = [];
+  let activeUtterances = []; // 防止瀏覽器 V8 垃圾回收 (GC) 導致語音突然停止
+  let cachedChineseVoices = [];
+  let speechKeepAliveTimer = null;
+  let isSpeechSpeaking = false;
+
+  function loadChineseVoices() {
+    if (!('speechSynthesis' in window)) return [];
+    try {
+      const allVoices = window.speechSynthesis.getVoices() || [];
+      cachedChineseVoices = allVoices.filter(function (v) {
+        return v.lang && (
+          v.lang.toLowerCase().indexOf('zh') !== -1 ||
+          v.lang.toLowerCase().indexOf('cmn') !== -1 ||
+          v.lang.toLowerCase().indexOf('yue') !== -1
+        );
+      });
+    } catch (e) {}
+    return cachedChineseVoices;
+  }
+
+  if ('speechSynthesis' in window) {
+    loadChineseVoices();
+    if (window.speechSynthesis.onvoiceschanged !== undefined) {
+      window.speechSynthesis.onvoiceschanged = function () {
+        loadChineseVoices();
+      };
+    }
+  }
+
+  // 專門挑選男性老者、磁性、沉穩智者風格的中文發音引擎
+  function pickGentleChineseVoice() {
+    if (!('speechSynthesis' in window)) return null;
+    const zhVoices = cachedChineseVoices.length > 0 ? cachedChineseVoices : loadChineseVoices();
+    if (zhVoices.length === 0) return null;
+
+    // 優先挑選磁性、成熟、智者風格的男聲關鍵字：
+    // - Edge/Windows/Azure: Yunjian (云健 - 沉稳成熟叙事老者), Yunyang (云扬 - 磁性男声), Yunxi (云希), Kangkang (康康), Zhiwei (志伟)
+    // - macOS/iOS: Sin-Ji, Danny, Kangkang, 或系统内建 Male 标号
+    // - Android/Google: cmn-cn-x-cce, Google 普通话 (男)
+    const preferredMaleKeywords = [
+      'yunjian',   // 微软云健（极佳的成熟深沉智者男声）
+      'yunyang',   // 微软云扬（磁性从容）
+      'yunxi',     // 微软云希
+      'kangkang',  // 康康（沉稳男声）
+      'danny',     // 丹尼
+      'sin-ji',    // 成熟粤/国语男声
+      'zhiwei',    // 志伟
+      'male',      // 包含 male 标识
+      '男'         // 中文标号含「男」
+    ];
+
+    for (let i = 0; i < preferredMaleKeywords.length; i++) {
+      const kw = preferredMaleKeywords[i];
+      const match = zhVoices.find(function (v) {
+        return (v.name && v.name.toLowerCase().indexOf(kw) !== -1);
+      });
+      if (match) return match;
+    }
+
+    // 若系统仅有一款通用声音，后续会通过音调(pitch: 0.74)与语速(rate: 0.74)自动塑造磁性老者音色！
+    return zhVoices[0];
+  }
 
   function stopGentleSpeech() {
     speechTimeoutIds.forEach(function (id) {
       clearTimeout(id);
     });
     speechTimeoutIds = [];
+    isSpeechSpeaking = false;
+    if (speechKeepAliveTimer) {
+      clearInterval(speechKeepAliveTimer);
+      speechKeepAliveTimer = null;
+    }
     if ('speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
+      try {
+        window.speechSynthesis.cancel();
+      } catch (e) {}
     }
+    activeUtterances = [];
   }
 
-  function pickGentleChineseVoice() {
-    if (!('speechSynthesis' in window)) return null;
-    const voices = window.speechSynthesis.getVoices() || [];
-    const zhVoices = voices.filter(function (v) {
-      return v.lang && (v.lang.toLowerCase().indexOf('zh') !== -1 || v.lang.toLowerCase().indexOf('cmn') !== -1);
-    });
-    if (zhVoices.length === 0) return null;
-
-    // 優先挑選自然溫柔女聲（如 Xiaoxiao, HsiaoChen, Mei-Jia, Tingting, Google 國語/普通話）
-    const preferredKeywords = ['xiaoxiao', 'hsiaochen', 'xiaoyi', 'yunxi', 'mei-jia', 'meijia', 'ting-ting', 'tingting', 'natural', 'google'];
-    for (let i = 0; i < preferredKeywords.length; i++) {
-      const kw = preferredKeywords[i];
-      const match = zhVoices.find(function (v) {
-        return v.name.toLowerCase().indexOf(kw) !== -1;
-      });
-      if (match) return match;
-    }
-    return zhVoices[0];
+  // 使用者手勢同步解鎖（解決 iOS / Safari / 微信瀏覽器延遲發聲被自動阻擋問題）
+  function primeAudioAndSpeech() {
+    getSharedAudioContext();
+    if (!('speechSynthesis' in window)) return;
+    try {
+      window.speechSynthesis.resume();
+      // 在手勢當下立即觸發一個極短的空白發音，換取瀏覽器對後續背景發聲的永久信任
+      const prime = new SpeechSynthesisUtterance(' ');
+      prime.volume = 0.01;
+      prime.rate = 1.0;
+      window.speechSynthesis.speak(prime);
+    } catch (e) {}
   }
 
-  if ('speechSynthesis' in window && window.speechSynthesis.onvoiceschanged !== undefined) {
-    window.speechSynthesis.onvoiceschanged = function () {
-      pickGentleChineseVoice();
-    };
-  }
-
-  function speakGentlePrompt(text) {
+  function speakGentlePrompt(text, onComplete) {
     if (!('speechSynthesis' in window) || !text) return;
+
+    try {
+      if (window.speechSynthesis.paused) {
+        window.speechSynthesis.resume();
+      }
+    } catch (e) {}
+
     stopGentleSpeech();
 
-    // 將句子依句號、分號或刪節號拆開，句子之間留出 1.6 秒的呼吸留白
-    const sentences = text
-      .replace(/[「」“”]/g, '')
-      .split(/[。；！…]+/)
+    // 清理引號等閱讀符號，將引導語依標點拆成獨立短句
+    const cleanText = text.replace(/[「」“”『』"]/g, '');
+    const sentences = cleanText
+      .split(/[。；！…？?]+/)
       .map(function (s) { return s.trim(); })
       .filter(function (s) { return s.length > 0; });
 
-    const voice = pickGentleChineseVoice();
+    if (sentences.length === 0) return;
 
-    function speakIndex(idx) {
-      if (idx >= sentences.length) return;
-      const utter = new SpeechSynthesisUtterance(sentences[idx]);
-      if (voice) utter.voice = voice;
-      utter.lang = voice ? voice.lang : 'zh-TW';
-      utter.rate = 0.80;   // 睡前放慢語速
-      utter.pitch = 0.92;  // 溫潤略低的聲線
-      utter.volume = 0.85;
+    const voice = pickGentleChineseVoice();
+    let currentIdx = 0;
+    isSpeechSpeaking = true;
+
+    // 防止 Chrome 15 秒背景假死 Bug
+    if (speechKeepAliveTimer) clearInterval(speechKeepAliveTimer);
+    speechKeepAliveTimer = setInterval(function () {
+      if ('speechSynthesis' in window && window.speechSynthesis.speaking) {
+        window.speechSynthesis.pause();
+        window.speechSynthesis.resume();
+      } else {
+        clearInterval(speechKeepAliveTimer);
+        speechKeepAliveTimer = null;
+      }
+    }, 9000);
+
+    function speakNext() {
+      if (currentIdx >= sentences.length || !isSpeechSpeaking) {
+        isSpeechSpeaking = false;
+        if (speechKeepAliveTimer) {
+          clearInterval(speechKeepAliveTimer);
+          speechKeepAliveTimer = null;
+        }
+        if (typeof onComplete === 'function') onComplete();
+        return;
+      }
+
+      const sText = sentences[currentIdx];
+      const utter = new SpeechSynthesisUtterance(sText);
+      if (voice) {
+        utter.voice = voice;
+        utter.lang = voice.lang;
+      } else {
+        // 多重地域語系容錯
+        const navLang = (navigator.language || '').toLowerCase();
+        if (navLang.indexOf('zh-tw') !== -1 || navLang.indexOf('zh-hk') !== -1) {
+          utter.lang = 'zh-TW';
+        } else {
+          utter.lang = 'zh-CN';
+        }
+      }
+
+      // 🎙️ 專屬「男性老者 · 磁性從容 · 智慧長者」聲學參數設定
+      // - pitch: 0.74（大幅降低音調基頻，模擬厚重深沉的胸腔共鳴）
+      // - rate: 0.74（極度沉穩、緩慢，符合長者指引的寧靜節奏）
+      // - volume: 1.0（聲音清晰飽滿）
+      utter.pitch = 0.74;
+      utter.rate = 0.74;
+      utter.volume = 1.0;
+
+      activeUtterances.push(utter); // 防止被 GC
+
+      function advance() {
+        const uIdx = activeUtterances.indexOf(utter);
+        if (uIdx !== -1) activeUtterances.splice(uIdx, 1);
+        currentIdx++;
+        if (currentIdx < sentences.length && isSpeechSpeaking) {
+          // 句子之間留出 1.8 秒的深呼吸留白
+          const tid = setTimeout(function () {
+            speakNext();
+          }, 1800);
+          speechTimeoutIds.push(tid);
+        } else {
+          isSpeechSpeaking = false;
+          if (typeof onComplete === 'function') onComplete();
+        }
+      }
 
       utter.onend = function () {
-        if (idx + 1 < sentences.length) {
-          const tid = setTimeout(function () {
-            speakIndex(idx + 1);
-          }, 1600);
-          speechTimeoutIds.push(tid);
-        }
+        advance();
       };
-      window.speechSynthesis.speak(utter);
+
+      utter.onerror = function (e) {
+        console.warn('Speech error:', e);
+        advance(); // 遇錯依然平穩前進，不卡死流程
+      };
+
+      try {
+        window.speechSynthesis.speak(utter);
+      } catch (err) {
+        console.warn('speak exception:', err);
+        advance();
+      }
     }
 
-    speakIndex(0);
+    // 留出 40ms 給 cancel() 徹底生效，避免瀏覽器並發抵消
+    const startTid = setTimeout(function () {
+      speakNext();
+    }, 40);
+    speechTimeoutIds.push(startTid);
   }
 
   // ---------- 9. 內建 10~15 分鐘睡前冥想計時器與分段引導 ----------
@@ -298,9 +445,12 @@
         if (!isFirstCue) {
           playSingingBowl(0.45);
         }
+        if (liveStageTag) liveStageTag.textContent = '🌙 ' + cue.stage + ' · 🎙️ 智者導引中...';
         const tid = setTimeout(function () {
-          speakGentlePrompt(cue.text);
-        }, isFirstCue ? 900 : 1400);
+          speakGentlePrompt(cue.text, function () {
+            if (liveStageTag) liveStageTag.textContent = '🌙 ' + cue.stage;
+          });
+        }, isFirstCue ? 800 : 1300);
         speechTimeoutIds.push(tid);
       } else if (guidanceMode === 'bell') {
         if (!isFirstCue) {
@@ -355,6 +505,7 @@
     // 切換引導方式（語音 / 頌缽 / 靜音）
     modeBtns.forEach(function (btn) {
       btn.addEventListener('click', function () {
+        primeAudioAndSpeech();
         modeBtns.forEach(function (b) { b.classList.remove('active'); });
         btn.classList.add('active');
         guidanceMode = btn.getAttribute('data-mode') || 'voice';
@@ -367,6 +518,7 @@
     // 切換時間長度（10 / 12 / 15 分鐘）
     presetBtns.forEach(function (btn) {
       btn.addEventListener('click', function () {
+        primeAudioAndSpeech();
         if (isRunning) {
           clearInterval(timerInterval);
           isRunning = false;
@@ -384,19 +536,37 @@
       });
     });
 
-    // 試聽語音引導按鈕
+    // 試聽 / 即時朗讀當前引導語按鈕（具備雙向切換功能）
     if (testVoiceBtn) {
       testVoiceBtn.addEventListener('click', function () {
+        primeAudioAndSpeech();
+        if (isSpeechSpeaking) {
+          stopGentleSpeech();
+          testVoiceBtn.textContent = '🔊 試聽 / 朗讀此段語音';
+          if (liveStageTag) liveStageTag.textContent = '✨ 準備開始 · 睡前引導語預覽';
+          return;
+        }
+
         const cues = getCuesFromDOM();
-        const sampleText = (cues.length > 0 && cues[0].text)
-          ? cues[0].text
-          : '現在，請用最舒服的姿勢平躺在床上，輕輕閉上雙眼，把白天的重量交給床鋪。';
-        speakGentlePrompt(sampleText);
+        const activeIdx = (lastTriggeredCueIndex >= 0 && lastTriggeredCueIndex < cues.length)
+          ? lastTriggeredCueIndex
+          : 0;
+        const targetCue = (cues.length > 0) ? cues[activeIdx] : null;
+        const sampleText = targetCue ? targetCue.text : '現在，請用最舒服的姿勢平躺在床上，輕輕閉上雙眼，把白天的重量交給床鋪。';
+
+        testVoiceBtn.textContent = '⏹️ 停止朗讀';
+        if (liveStageTag) liveStageTag.textContent = (targetCue ? '🌙 ' + targetCue.stage : '🌙 睡前引導') + ' · 🎙️ 智者導引中...';
+
+        speakGentlePrompt(sampleText, function () {
+          testVoiceBtn.textContent = '🔊 試聽 / 朗讀此段語音';
+          if (liveStageTag) liveStageTag.textContent = targetCue ? '🌙 ' + targetCue.stage : '✨ 睡前引導';
+        });
       });
     }
 
     if (startBtn) {
       startBtn.addEventListener('click', function () {
+        primeAudioAndSpeech();
         if (!isRunning) {
           if (remainingSeconds <= 0) {
             totalSeconds = selectedMinutes * 60;
@@ -432,6 +602,7 @@
           startBtn.textContent = '繼續冥想';
           stopBreathingGuide();
           stopGentleSpeech();
+          if (testVoiceBtn) testVoiceBtn.textContent = '🔊 試聽 / 朗讀此段語音';
         }
       });
     }
@@ -445,6 +616,7 @@
         lastTriggeredCueIndex = -1;
         updateDisplay();
         if (startBtn) startBtn.textContent = '開始睡前冥想';
+        if (testVoiceBtn) testVoiceBtn.textContent = '🔊 試聽 / 朗讀此段語音';
         stopBreathingGuide();
         stopGentleSpeech();
         const cues = getCuesFromDOM();
