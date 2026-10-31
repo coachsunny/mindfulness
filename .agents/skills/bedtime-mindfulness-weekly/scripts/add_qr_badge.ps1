@@ -34,7 +34,9 @@ $font = New-Object System.Drawing.Font("Microsoft YaHei", 9.5, [System.Drawing.F
 $textBrush = New-Object System.Drawing.SolidBrush([System.Drawing.Color]::FromArgb(245, 235, 190, 118))
 $sf = New-Object System.Drawing.StringFormat
 $sf.Alignment = [System.Drawing.StringAlignment]::Center
-$g.DrawString("扫码进入睡前练习", $font, $textBrush, [float]($x + $qrSize / 2), [float]($y + $qrSize + 4), $sf)
+# 使用 Unicode 編碼確保跨系統無亂碼 ("扫码进入睡前练习")
+$labelStr = "$([char]0x626B)$([char]0x7801)$([char]0x8FDB)$([char]0x5165)$([char]0x7761)$([char]0x524D)$([char]0x7EC3)$([char]0x4E60)"
+$g.DrawString($labelStr, $font, $textBrush, [float]($x + $qrSize / 2), [float]($y + $qrSize + 4), $sf)
 
 $jpegCodec = [System.Drawing.Imaging.ImageCodecInfo]::GetImageEncoders() | Where-Object { $_.MimeType -eq 'image/jpeg' }
 $ep = New-Object System.Drawing.Imaging.EncoderParameters(1)
