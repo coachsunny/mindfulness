@@ -171,23 +171,67 @@
     }
   }
 
-  // ---------- 8. Web Speech API 智者老者磁性慢速語音引導器 ----------
+  // ---------- 8. 真人級普通話智者音訊 (HTML5 Audio) + 標準普通話 Web Speech 雙引擎引導器 ----------
   let speechTimeoutIds = [];
   let activeUtterances = []; // 防止瀏覽器 V8 垃圾回收 (GC) 導致語音突然停止
   let cachedChineseVoices = [];
   let speechKeepAliveTimer = null;
   let isSpeechSpeaking = false;
 
+  // 共享單一 HTML5 Audio 實例：在微信內建瀏覽器 (XWeb / WKWebView)、iOS Safari、Android Chrome 皆可透過點擊手勢一次解鎖後全程自動播放
+  let guidanceAudio = null;
+  if (typeof Audio !== 'undefined') {
+    guidanceAudio = new Audio();
+    guidanceAudio.preload = 'auto';
+    guidanceAudio.setAttribute('playsinline', 'true');
+    guidanceAudio.setAttribute('webkit-playsinline', 'true');
+  }
+
+  // 判斷是否為粵語/香港語音（嚴格排除，確保 100% 只說標準普通話/國語）
+  function isCantoneseVoice(v) {
+    if (!v) return true;
+    const lang = (v.lang || '').toLowerCase();
+    const name = (v.name || '').toLowerCase();
+    const uri = (v.voiceURI || '').toLowerCase();
+    if (
+      lang.indexOf('yue') !== -1 ||
+      lang.indexOf('zh-hk') !== -1 ||
+      lang.indexOf('zh_hk') !== -1 ||
+      lang.indexOf('zh-mo') !== -1 ||
+      lang.indexOf('zh_mo') !== -1
+    ) {
+      return true;
+    }
+    const cantoneseKeywords = [
+      'cantonese', 'hong kong', 'hongkong', '粤', '粵', '香港',
+      'sin-ji', 'sinji', 'danny', 'wanlung', 'hiumaan', 'hiugaai', '善怡'
+    ];
+    for (let i = 0; i < cantoneseKeywords.length; i++) {
+      const kw = cantoneseKeywords[i];
+      if (name.indexOf(kw) !== -1 || uri.indexOf(kw) !== -1) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   function loadChineseVoices() {
     if (!('speechSynthesis' in window)) return [];
     try {
       const allVoices = window.speechSynthesis.getVoices() || [];
       cachedChineseVoices = allVoices.filter(function (v) {
-        return v.lang && (
-          v.lang.toLowerCase().indexOf('zh') !== -1 ||
-          v.lang.toLowerCase().indexOf('cmn') !== -1 ||
-          v.lang.toLowerCase().indexOf('yue') !== -1
+        if (!v || !v.lang) return false;
+        const lang = v.lang.toLowerCase();
+        const isMandarinLang = (
+          lang.indexOf('zh-cn') !== -1 ||
+          lang.indexOf('zh_cn') !== -1 ||
+          lang.indexOf('zh-tw') !== -1 ||
+          lang.indexOf('zh_tw') !== -1 ||
+          lang.indexOf('zh-sg') !== -1 ||
+          lang.indexOf('cmn') !== -1 ||
+          lang === 'zh'
         );
+        return isMandarinLang && !isCantoneseVoice(v);
       });
     } catch (e) {}
     return cachedChineseVoices;
@@ -202,37 +246,38 @@
     }
   }
 
-  // 專門挑選男性老者、磁性、沉穩智者風格的中文發音引擎
+  // 專門挑選標準普通話（排除粵語）男性老者、磁性、沉穩智者風格的中文發音引擎
   function pickGentleChineseVoice() {
     if (!('speechSynthesis' in window)) return null;
     const zhVoices = cachedChineseVoices.length > 0 ? cachedChineseVoices : loadChineseVoices();
     if (zhVoices.length === 0) return null;
 
-    // 優先挑選磁性、成熟、智者風格的男聲關鍵字：
-    // - Edge/Windows/Azure: Yunjian (云健 - 沉稳成熟叙事老者), Yunyang (云扬 - 磁性男声), Yunxi (云希), Kangkang (康康), Zhiwei (志伟)
-    // - macOS/iOS: Sin-Ji, Danny, Kangkang, 或系统内建 Male 标号
-    // - Android/Google: cmn-cn-x-cce, Google 普通话 (男)
-    const preferredMaleKeywords = [
-      'yunjian',   // 微软云健（极佳的成熟深沉智者男声）
-      'yunyang',   // 微软云扬（磁性从容）
-      'yunxi',     // 微软云希
-      'kangkang',  // 康康（沉稳男声）
-      'danny',     // 丹尼
-      'sin-ji',    // 成熟粤/国语男声
-      'zhiwei',    // 志伟
-      'male',      // 包含 male 标识
+    // 優先挑選標準普通話磁性、成熟、智者風格的男聲關鍵字（嚴格不含 sin-ji / danny 等粵語聲音）：
+    const preferredMandarinMaleKeywords = [
+      'yunjian',   // 微软云健（标准普通话 · 沉稳成熟叙事老者）
+      'yunyang',   // 微软云扬（标准普通话 · 磁性从容男声）
+      'yunxi',     // 微软云希（标准普通话男声）
+      'kangkang',  // 康康（标准普通话沉稳男声）
+      'zhiwei',    // 志伟（国语男声）
+      'male',      // 包含 male 标识的普通话男声
       '男'         // 中文标号含「男」
     ];
 
-    for (let i = 0; i < preferredMaleKeywords.length; i++) {
-      const kw = preferredMaleKeywords[i];
+    for (let i = 0; i < preferredMandarinMaleKeywords.length; i++) {
+      const kw = preferredMandarinMaleKeywords[i];
       const match = zhVoices.find(function (v) {
-        return (v.name && v.name.toLowerCase().indexOf(kw) !== -1);
+        return v.name && v.name.toLowerCase().indexOf(kw) !== -1;
       });
       if (match) return match;
     }
 
-    // 若系统仅有一款通用声音，后续会通过音调(pitch: 0.74)与语速(rate: 0.74)自动塑造磁性老者音色！
+    // 次選：優先挑選 zh-CN 標準普通話語音（如 Ting-Ting / Xiaoxiao / Google 普通話）
+    const cnVoice = zhVoices.find(function (v) {
+      const l = (v.lang || '').toLowerCase();
+      return l.indexOf('zh-cn') !== -1 || l.indexOf('zh_cn') !== -1 || l.indexOf('cmn-cn') !== -1;
+    });
+    if (cnVoice) return cnVoice;
+
     return zhVoices[0];
   }
 
@@ -246,6 +291,14 @@
       clearInterval(speechKeepAliveTimer);
       speechKeepAliveTimer = null;
     }
+    if (guidanceAudio) {
+      try {
+        guidanceAudio.pause();
+        guidanceAudio.currentTime = 0;
+        guidanceAudio.onended = null;
+        guidanceAudio.onerror = null;
+      } catch (e) {}
+    }
     if ('speechSynthesis' in window) {
       try {
         window.speechSynthesis.cancel();
@@ -254,22 +307,25 @@
     activeUtterances = [];
   }
 
-  // 使用者手勢同步解鎖（解決 iOS / Safari / 微信瀏覽器延遲發聲被自動阻擋問題）
+  // 使用者手勢同步解鎖（解決微信內建瀏覽器 / iOS Safari 延遲發聲被自動阻擋問題）
   function primeAudioAndSpeech() {
     getSharedAudioContext();
-    if (!('speechSynthesis' in window)) return;
-    try {
-      window.speechSynthesis.resume();
-      // 在手勢當下立即觸發一個極短的空白發音，換取瀏覽器對後續背景發聲的永久信任
-      const prime = new SpeechSynthesisUtterance(' ');
-      prime.volume = 0.01;
-      prime.rate = 1.0;
-      window.speechSynthesis.speak(prime);
-    } catch (e) {}
   }
 
-  function speakGentlePrompt(text, onComplete) {
-    if (!('speechSynthesis' in window) || !text) return;
+  // 微信內建瀏覽器專屬 WeixinJSBridge 預先就緒支援
+  if (typeof document !== 'undefined') {
+    document.addEventListener('WeixinJSBridgeReady', function () {
+      getSharedAudioContext();
+    }, false);
+  }
+
+  // 後備方案：當預生成普通話 MP3 無法載入時，使用標準普通話 Web Speech API 朗讀
+  function speakFallbackMandarinTTS(text, onComplete) {
+    if (!('speechSynthesis' in window) || !text) {
+      isSpeechSpeaking = false;
+      if (typeof onComplete === 'function') onComplete();
+      return;
+    }
 
     try {
       if (window.speechSynthesis.paused) {
@@ -277,22 +333,22 @@
       }
     } catch (e) {}
 
-    stopGentleSpeech();
-
-    // 清理引號等閱讀符號，將引導語依標點拆成獨立短句
     const cleanText = text.replace(/[「」“”『』"]/g, '');
     const sentences = cleanText
       .split(/[。；！…？?]+/)
       .map(function (s) { return s.trim(); })
       .filter(function (s) { return s.length > 0; });
 
-    if (sentences.length === 0) return;
+    if (sentences.length === 0) {
+      isSpeechSpeaking = false;
+      if (typeof onComplete === 'function') onComplete();
+      return;
+    }
 
     const voice = pickGentleChineseVoice();
     let currentIdx = 0;
     isSpeechSpeaking = true;
 
-    // 防止 Chrome 15 秒背景假死 Bug
     if (speechKeepAliveTimer) clearInterval(speechKeepAliveTimer);
     speechKeepAliveTimer = setInterval(function () {
       if ('speechSynthesis' in window && window.speechSynthesis.speaking) {
@@ -321,31 +377,21 @@
         utter.voice = voice;
         utter.lang = voice.lang;
       } else {
-        // 多重地域語系容錯
-        const navLang = (navigator.language || '').toLowerCase();
-        if (navLang.indexOf('zh-tw') !== -1 || navLang.indexOf('zh-hk') !== -1) {
-          utter.lang = 'zh-TW';
-        } else {
-          utter.lang = 'zh-CN';
-        }
+        // 強制使用標準普通話 zh-CN，絕不因系統地區為香港而落入 zh-HK 粵語
+        utter.lang = 'zh-CN';
       }
 
-      // 🎙️ 專屬「男性老者 · 磁性從容 · 智慧長者」聲學參數設定
-      // - pitch: 0.74（大幅降低音調基頻，模擬厚重深沉的胸腔共鳴）
-      // - rate: 0.74（極度沉穩、緩慢，符合長者指引的寧靜節奏）
-      // - volume: 1.0（聲音清晰飽滿）
       utter.pitch = 0.74;
       utter.rate = 0.74;
       utter.volume = 1.0;
 
-      activeUtterances.push(utter); // 防止被 GC
+      activeUtterances.push(utter);
 
       function advance() {
         const uIdx = activeUtterances.indexOf(utter);
         if (uIdx !== -1) activeUtterances.splice(uIdx, 1);
         currentIdx++;
         if (currentIdx < sentences.length && isSpeechSpeaking) {
-          // 句子之間留出 1.8 秒的深呼吸留白
           const tid = setTimeout(function () {
             speakNext();
           }, 1800);
@@ -360,24 +406,52 @@
         advance();
       };
 
-      utter.onerror = function (e) {
-        console.warn('Speech error:', e);
-        advance(); // 遇錯依然平穩前進，不卡死流程
+      utter.onerror = function () {
+        advance();
       };
 
       try {
         window.speechSynthesis.speak(utter);
       } catch (err) {
-        console.warn('speak exception:', err);
         advance();
       }
     }
 
-    // 留出 40ms 給 cancel() 徹底生效，避免瀏覽器並發抵消
-    const startTid = setTimeout(function () {
-      speakNext();
-    }, 40);
-    speechTimeoutIds.push(startTid);
+    // 同步直接呼叫 speakNext()，保留行動端與微信的手勢啟動權限
+    speakNext();
+  }
+
+  // 主語音引導函式：優先播放預先生成的「微軟雲健 (zh-CN-YunjianNeural) 標準普通話老者男聲」MP3，微信內直開即有聲
+  function speakGentlePrompt(text, onComplete, audioUrl) {
+    stopGentleSpeech();
+    isSpeechSpeaking = true;
+
+    if (guidanceAudio && audioUrl) {
+      try {
+        guidanceAudio.src = audioUrl;
+        guidanceAudio.volume = 1.0;
+        guidanceAudio.onended = function () {
+          isSpeechSpeaking = false;
+          if (typeof onComplete === 'function') onComplete();
+        };
+        guidanceAudio.onerror = function () {
+          // 若音訊檔載入失敗，無縫切換至標準普通話 Web Speech TTS
+          speakFallbackMandarinTTS(text, onComplete);
+        };
+        const playPromise = guidanceAudio.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(function () {
+            speakFallbackMandarinTTS(text, onComplete);
+          });
+        }
+        return;
+      } catch (e) {
+        speakFallbackMandarinTTS(text, onComplete);
+        return;
+      }
+    }
+
+    speakFallbackMandarinTTS(text, onComplete);
   }
 
   // ---------- 9. 內建 10~15 分鐘睡前冥想計時器與分段引導 ----------
@@ -405,7 +479,7 @@
     let isRunning = false;
     let lastTriggeredCueIndex = -1;
 
-    // 從 DOM 讀取當週的引導語陣列（支援 OpenCC 轉換後的簡體或繁體文字）
+    // 從 DOM 讀取當週的引導語陣列與預生成普通話 MP3 音訊路徑
     function getCuesFromDOM() {
       const container = document.getElementById('guidanceScriptData');
       if (!container) return [];
@@ -413,10 +487,12 @@
       const cues = [];
       items.forEach(function (el) {
         const pct = parseFloat(el.getAttribute('data-pct')) || 0;
+        const audioUrl = el.getAttribute('data-audio') || '';
         const stageEl = el.querySelector('.cue-stage');
         const textEl = el.querySelector('.cue-text');
         cues.push({
           pct: pct,
+          audioUrl: audioUrl,
           stage: stageEl ? stageEl.textContent.trim() : '睡前正念引導',
           text: textEl ? textEl.textContent.trim() : ''
         });
@@ -446,12 +522,19 @@
           playSingingBowl(0.45);
         }
         if (liveStageTag) liveStageTag.textContent = '🌙 ' + cue.stage + ' · 🎙️ 智者導引中...';
-        const tid = setTimeout(function () {
+        if (isFirstCue) {
+          // 第一段引導在使用者點擊「開始睡前冥想」當下同步立即播放，確保微信與手機瀏覽器 100% 授權發聲
           speakGentlePrompt(cue.text, function () {
             if (liveStageTag) liveStageTag.textContent = '🌙 ' + cue.stage;
-          });
-        }, isFirstCue ? 800 : 1300);
-        speechTimeoutIds.push(tid);
+          }, cue.audioUrl);
+        } else {
+          const tid = setTimeout(function () {
+            speakGentlePrompt(cue.text, function () {
+              if (liveStageTag) liveStageTag.textContent = '🌙 ' + cue.stage;
+            }, cue.audioUrl);
+          }, 900);
+          speechTimeoutIds.push(tid);
+        }
       } else if (guidanceMode === 'bell') {
         if (!isFirstCue) {
           playSingingBowl(0.55);
@@ -553,6 +636,7 @@
           : 0;
         const targetCue = (cues.length > 0) ? cues[activeIdx] : null;
         const sampleText = targetCue ? targetCue.text : '現在，請用最舒服的姿勢平躺在床上，輕輕閉上雙眼，把白天的重量交給床鋪。';
+        const sampleAudioUrl = targetCue ? targetCue.audioUrl : '';
 
         testVoiceBtn.textContent = '⏹️ 停止朗讀';
         if (liveStageTag) liveStageTag.textContent = (targetCue ? '🌙 ' + targetCue.stage : '🌙 睡前引導') + ' · 🎙️ 智者導引中...';
@@ -560,7 +644,7 @@
         speakGentlePrompt(sampleText, function () {
           testVoiceBtn.textContent = '🔊 試聽 / 朗讀此段語音';
           if (liveStageTag) liveStageTag.textContent = targetCue ? '🌙 ' + targetCue.stage : '✨ 睡前引導';
-        });
+        }, sampleAudioUrl);
       });
     }
 

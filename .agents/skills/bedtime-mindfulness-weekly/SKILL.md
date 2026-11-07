@@ -57,6 +57,8 @@ description: >-
    * `## 二、 背後的簡要學理：...`（使用 `<div class="theory-box">...</div>` 包覆）
    * `## 三、 10～15 分鐘睡前冥想：進行方式與引導語`（使用 `<div class="practice-step-box">` 包覆各階段，內含 `<div class="guidance-script-quote">` 逐段伴讀引導詞與 `<span class="pause-hint">（……留白提示……）</span>`）
    * `## 四、 最後一句正念話語`（以 `> **「...」**` 引用區塊呈現）
+3. **預生成「微軟雲健（標準普通話 · 沉穩老者男聲）」真人級 MP3 語音檔**：
+   * 執行腳本 [generate_voice_audio.py](./scripts/generate_voice_audio.py)（使用 `python .agents/skills/bedtime-mindfulness-weekly/scripts/generate_voice_audio.py`），將當週 `guidance_script` 各階段引導詞轉換為 `assets/audio/weekXX/cue-0.mp3` 等標準普通話音訊檔，確保使用者在微信內建瀏覽器點擊即可直接聆聽標準普通話智者引導。
 
 ---
 

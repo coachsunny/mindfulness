@@ -110,7 +110,7 @@ layout: default
         </p>
         <div class="voice-hint-bar" id="voiceHintBar">
           <span class="voice-hint-icon">💡</span>
-          <span class="voice-hint-text"><strong>聽不到語音？</strong>iPhone 請務必檢查手機側邊實體<strong>靜音撥片是否關閉（紅色為靜音）</strong>並調大音量；微信內若被限制發聲，可點右上角「…」選擇<strong>「在瀏覽器打開（Safari / Chrome）」</strong>。</span>
+          <span class="voice-hint-text"><strong>溫馨提示：</strong>本站已內建<strong>微軟雲健（標準普通話 · 沉穩老者男聲）真人級引導音訊</strong>，支援在微信內直接點擊播放；iPhone 用戶請確認手機側邊實體<strong>靜音撥片已關閉</strong>並調適音量。</span>
         </div>
       </div>
 
@@ -118,7 +118,7 @@ layout: default
       {% if page.guidance_script %}
       <div id="guidanceScriptData" style="display:none;" aria-hidden="true">
         {% for item in page.guidance_script %}
-        <div class="guidance-cue-item" data-pct="{{ item.time_pct }}">
+        <div class="guidance-cue-item" data-pct="{{ item.time_pct }}" data-audio="{{ '/assets/audio/week' | append: page.week | append: '/cue-' | append: forloop.index0 | append: '.mp3' | relative_url }}">
           <span class="cue-stage">{{ item.stage }}</span>
           <span class="cue-text">{{ item.text }}</span>
         </div>
